@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "name": "Marteau",
+    "description": "Un simple marteau",
+    "id_category": "1"
+  },
+  {
+    "id": "2",
+    "name": "Corbeau",
+    "description": "Une bière blonde",
+    "id_category": "2"
+  },
+  {
+    "id": "3",
+    "name": "Chimay bleue",
+    "description": "Une bière brune",
+    "id_category": "2"
+  },
+  {
+    "id": "4",
+    "name": "Hoegaarden",
+    "description": "Une bière blanche",
+    "id_category": "2"
+  },
+  {
+    "id": "5",
+    "name": "Guinness",
+    "description": "Une bière dégueulasse",
+    "id_category": "2"
+  },
+  {
+    "id": "6",
+    "name": "Perceuse",
+    "description": "Une perceuse pour faire des trous",
+    "id_category": "1"
+  }
+]

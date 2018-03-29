@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "id_product": "1",
+    "currency":"€",
+    "price": "5"
+  },
+  {
+    "id": "2",
+    "id_product": "1",
+    "currency":"$",
+    "price": "7"
+  },
+  {
+    "id": "3",
+    "id_product": "2",
+    "currency":"€",
+    "price": "3"
+  },
+  {
+    "id": "4",
+    "id_product": "3",
+    "currency":"€",
+    "price": "6"
+  }
+]

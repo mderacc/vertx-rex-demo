@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Vertx</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/blood.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<link rel="stylesheet" href="css/theme/blood.css" id="theme">
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<img src="img/Vert.x_Logo2.svg.png" style="max-width: 50%;max-height: 50%;">
+					<h4>Présentation et retour d'expérience</h4>
+				</section>
+
+				<section id="fragments">
+					<h3>Sommaire</h3>
+					<ol>
+						<li class="fragment">Vertx c'est quoi ?</li>
+						<li class="fragment">Quelques exemples de features</li>
+						<li class="fragment">Vertx dans le contexte Décathlon</li>
+						<li class="fragment">Nouveautés de la version 3.5</li>
+						<li class="fragment">Conclusion</li>
+					</ol>
+				</section>
+
+				<section>
+					<section>
+						<h2>Vertx c'est quoi ?</h2>
+					</section>
+					<section>
+						<h3>Un framework événementiel</h3>
+						<ul>
+							<li class="fragment">Une boîte a outils inspirée de Node.js</li>
+							<li class="fragment">Permet de créer des serveurs web performants</li>
+							<li class="fragment">Repose sur la notion de verticle</li>
+							<li class="fragment">Utilisé par beaucoup d'entreprises connues</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Polyglotte</h3>
+						<img src="img/Java_Logo.svg.png" style="max-width: 12%;max-height: 12%;margin-right:40px;">
+						<img src="img/Kotlin_logo.svg.png" style="max-width: 13%;max-height: 13%;margin-right:40px;">
+						<img src="img/scala_logo256.png" style="max-width: 15%;max-height: 15%;margin-right:40px;">
+						<img src="img/js_logo.png" style="max-width: 13%;max-height: 13%;margin-right:40px;">
+						<img src="img/groovy_logo.svg.png" style="max-width: 25%;max-height: 25%;margin-right:40px;">
+						<img src="img/ruby_logo.png" style="max-width: 15%;max-height: 15%;margin-right:40px;">
+						<img src="img/ceylon_logo.png" style="max-width: 25%;max-height: 25%;margin-right:40px;">
+					</section>
+					<section>
+						<h3>Scalable</h3>
+						<ul>
+							<li class="fragment">A l'exception des verticles "workers", Vertx est non bloquant</li>
+							<li class="fragment">Les réponses sont reçues de manière asynchrone</li>
+							<li class="fragment">Très bonnes performances !</li>
+							<li class="fragment">Peut être réparti entre plusieurs machines</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Qu'est ce qu'un Verticle ?</h3>
+						<ul>
+							<li class="fragment">Verticle = classe qui "expose" des handlers</li>
+							<li class="fragment">Les verticles peuvent être écris dans différent langage</li>
+							<li class="fragment">Une instance Vertx maintient N threads d'Event Loop</li>
+							<li class="fragment">Un verticle est rattaché a un seul thread</li>
+							<li class="fragment">Les verticles communiquent via event bus</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Fonctionnement de l'Event Loop</h3>
+							<img src="img/vertx-event-loop2.png" style="max-width: 75%;max-height: 75%;">
+					</section>
+					<section>
+						<h3>Vertx vs NodeJs</h3><br/>
+							<img src="img/76327dda4553b333ae0eb02023022b7d.png">
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Quelques exemples de features</h2>
+					</section>
+					<section>
+						<h3>Routing et handlers</h3>
+					</section>
+					<section>
+						<h3>HealthCheck</h3><br/>
+						<pre><code> HealthCheckHandler.create(vertx).register("healthcheck", future -> {
+      future.complete();
+    });</code></pre>
+					</section>
+					<section>
+						<h3>Config</h3><br/>
+						<pre><code>ConfigStoreOptions fileStore = new ConfigStoreOptions()
+	.setType("file")
+  	.setOptional(true)
+  	.setConfig(new JsonObject().put("path", "config.json"));
+ConfigStoreOptions sysPropsStore = new ConfigStoreOptions()
+	.setType("sys");
+
+ConfigRetrieverOptions options = new ConfigRetrieverOptions()
+	.addStore(fileStore)
+	.addStore(sysPropsStore);
+
+ConfigRetriever retriever = ConfigRetriever.create(vertx, options);</code></pre>
+					</section>
+					<section>
+						<h3>Event bus</h3><br/>
+						<pre><code>//Envoyer
+vertx.eventBus().send("TEST", message);
+
+//Recevoir
+final EventBus bus = vertx.eventBus();
+final MessageConsumer<String> consumer = bus.consumer("TEST");
+consumer.handler(message -> {
+    System.out.println("incoming message: " + message.body());
+});</code></pre>
+					</section>
+					<section>
+						<h3>Circuit Breaker</h3><br/>
+						<pre><code>CircuitBreaker breaker = CircuitBreaker.create("circuit-breaker",
+     vertx, new CircuitBreakerOptions()
+	        .setMaxFailures(5) 
+	        .setTimeout(2000) 
+	        .setFallbackOnFailure(true) 
+	        .setResetTimeout(10000) 
+);
+
+breaker.execute(future -> {
+  //...
+}).setHandler(ar -> {
+  //...
+});</code></pre>
+					</section>		
+				</section>
+				<section>
+					<section>
+						<h2>Vertx dans le contexte Décathlon</h2>
+					</section>
+					<section>
+						<h3>Origine du projet</h3>
+						<ul>
+							<li class="fragment">Besoins d'accès aux données CRC stockées dans OSVC.</li>
+							<li class="fragment"><b>Problème 1 : </b>OSVC renvoie les données sous forme de "rapport".</li>
+							<li class="fragment"><b>Problème 2 : </b>OSVC ne peut pas être appelé directement par certaines applications.</li>
+							<li class="fragment"><b>Problème 3 : </b>OSVC est parfois lent a répondre.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Quelle solution ?</h3>
+						<ul>
+							<li class="fragment">Nécessité de développer une couche de "nettoyage" des données.</li>
+							<li class="fragment">Couche devant faire passerelle entre OSVC et Instore.</li>
+							<li class="fragment">Couche devant être non bloquante.</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>Schéma global</h3>
+						<img src="img/APIL_schema2.png" style="max-width: 150%;max-height: 150%;">
+					</section>
+					<section>
+						<h3>Points "clés" de l'APIL</h3>
+						<ul>
+							<li class="fragment">La partie Core permet de générer les handlers a partir de la swaggerDoc.</li>
+							<li class="fragment">Référentiels et KPI stockés en cache.</li>
+							<li class="fragment">Transformation de données effectuée par Jackson.</li>
+							<li class="fragment">Parrallélisation des traitements avec les Futures Vertx.
+							<li class="fragment">Orienté ressources.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Un exemple de cheminement</h3>
+						<img src="img/APIL_cheminement2.png">
+					</section>
+					<section>
+						<h3>Quoi d'autres sur l'APIL ?</h3>
+						<ul>
+							<li class="fragment">Couplé depuis quelques mois avec Spring Boot.</li>
+							<li class="fragment">Chaque ressource est exposée au sein d'un conteneur.</li>
+							<li class="fragment">Orchestration avec Rancher.</li>
+							<li class="fragment">Déploiements effectués via Rundeck.</li>
+							<li class="fragment">Bientôt remplacé par WebFlux.</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<h3>Nouveautés de la version 3.5</h3>
+					<ul>
+						<li class="fragment">Support Java 9.</li>
+						<li class="fragment">Support OpenAPI 3 (OpenAPI3RouterFactory).</li>
+						<li class="fragment">Validation des requêtes HTTP (HTTPRequestValidationHandler).</li>
+						<li class="fragment">Support des coroutines Kotlin.</li>
+						<li class="fragment">Depuis la 3.5.1, support de JUnit 5.</li>
+					</ul>
+				</section>
+				<section style="text-align:left;">
+					<h3 style="text-align:center;">Conclusion</h3><br/>
+					<p><span style="color:#009933;">+ </span>Simple a prendre en main.</p>
+					<p><span style="color:#009933;">+ </span>Souple et polyglotte.</p>
+					<p><span style="color:#009933;">+ </span>Performances.</p>
+					<p><span style="color:red;">- </span>Pas en annotation, pas d'injection de dépendance.</p>
+					<br/>
+					<b>A tester => WebFlux</b>
+					
+				</section>
+				<section>
+					<h2>Questions ?</h2>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
